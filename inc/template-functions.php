@@ -5,24 +5,120 @@
  * @package Whatever
  */
 
-//filter posts by tax language
-function filter_cpt_by_language($query) {
-    if (!is_admin() && $query->is_main_query() && $query->get('post_type')) {
-        // Only for current CPT
-		$cpt_array = ['reviews', 'articles', 'papers', 'interviews', 'videos', 'audios', 'press', 'memorials', 'projects', 'unpublished'];
-		$query_cpt = $query->get('post_type');
+// return menu on archive page with ctps have posts in selected language
+function post_type_menu_filtered_by_language($post_type, $lang_id){
+	$post_type_menu =[];
+	$post_type_menu_html = '';
 
-        if ( in_array($query_cpt, $cpt_array, true) ) {
-            $query->set('tax_query', array(
-                array(
-					'taxonomy' => 'language',
-					'operator' => 'NOT EXISTS',
-                ),
-            ));
-        }
+	if ( !empty($lang_id) && is_int($lang_id) ){
+		$all_cpt_array = ['reviews', 'articles', 'papers', 'interviews', 'videos', 'audios', 'press', 'memorials', 'projects', 'unpublished', 'books'];
+		$key = array_search($post_type, $all_cpt_array);
+		unset($all_cpt_array[$key]);
+
+		//for every cpt check posts with selected language
+		foreach ($all_cpt_array as $cpt){
+			$args = array(
+				'post_type' => $cpt,
+				'posts_per_page' => 1,
+				'tax_query' => array(
+					array(
+						'taxonomy' => 'language',
+						'field'    => 'id',
+						'terms'    => $lang_id
+					)
+				)
+			);
+			$cpt_post = get_posts($args);
+			//add menu item with current cpt if get post with selected language
+			if ( !empty($cpt_post) ){
+				$site_url = home_url();
+				$menu_item = '<snap><a style="color: grey" href="' . $site_url . '/' . $cpt .  '/?book_language=' . $lang_id . '">' . $cpt . '</a></snap>';
+				array_push($post_type_menu, $menu_item);
+			}
+		}
+
+		if ( !empty( $post_type_menu ) ) {
+			$post_type_menu_html = '<div class="page-notice"><p>You may also read other materials in this language. See ' . implode(", ", $post_type_menu ) . ' in chosen language.</p></div>';
+		}
+
+	}
+	
+	return $post_type_menu_html;	
+}
+
+
+//filter custom post types by languages on archive page
+function filter_cpt_by_language($query) {
+    if(!is_admin() && $query->is_main_query() && isset($query->query_vars['post_type'])) {
+		$cpt_array = ['reviews', 'articles', 'papers', 'interviews', 'videos', 'audios', 'press', 'memorials', 'projects', 'unpublished'];
+		$query_post_type = $query->get('post_type');
+
+        if(isset($_GET['book_language']) && !empty($_GET['book_language'])) {
+			$selected_language_id = intval($_GET['book_language']);
+
+			if ( is_post_type_archive( 'books' ) ){
+				// Получаем все ID постов, у которых есть перевод на выбранный язык
+				$posts_with_language = [];
+				$all_books = get_posts([
+					'post_type' => 'books',
+					'posts_per_page' => -1,
+					'fields' => 'ids'
+				]);
+				
+				foreach($all_books as $book_id) {
+					if(have_rows('translations', $book_id)) {
+						while(have_rows('translations', $book_id)) {
+							the_row();
+							if($language = get_sub_field('language')) {
+								foreach($language as $lang) {
+									if($lang->term_id == $selected_language_id) {
+										$posts_with_language[] = $book_id;
+										break 2; // Прерываем оба цикла, если нашли язык
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				if(!empty($posts_with_language)) {
+					$query->set('post__in', $posts_with_language);
+				} else {
+					// Если не найдено книг с выбранным языком, возвращаем пустой результат
+					$query->set('post__in', [0]);
+				}
+			} elseif( is_archive() && in_array($query_post_type, $cpt_array, true)) {
+				$query->set('tax_query', array(
+					array(
+						'taxonomy' => 'language',
+						'field'    => 'id',
+						'terms'    => $selected_language_id,
+					),
+				));
+			}   
+        } else { //book_language unset or empty
+			if ( in_array($query_post_type, $cpt_array, true) ) {
+				$query->set('tax_query', array(
+					array(
+						'taxonomy' => 'language',
+						'operator' => 'NOT EXISTS',
+					),
+				));
+			}
+		}
     }
+    return $query;
 }
 add_action('pre_get_posts', 'filter_cpt_by_language');
+
+// Очищаем кэш языков при обновлении постов типа books
+function clear_books_languages_cache($post_id) {
+    if(get_post_type($post_id) === 'books') {
+        delete_transient('books_languages');
+    }
+}
+add_action('save_post', 'clear_books_languages_cache');
+add_action('deleted_post', 'clear_books_languages_cache');
 
 /**
  * Adds custom classes to the array of body classes.
