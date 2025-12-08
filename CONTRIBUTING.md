@@ -2,6 +2,14 @@
 
 Thank you for your interest in contributing! Please follow these guidelines.
 
+# Quick Start
+
+1. Fork this repository and clone your fork locally.
+2. Set up a local WordPress environment (Docker, Local, MAMP, etc.) and place or symlink the theme
+   into `/wp-content/themes/`.
+3. Activate required plugins before activating the theme:
+   - **Advanced Custom Fields Pro** (required — activate ACF first, then the theme)
+
 ## Setup Local Development
 
 ### Prerequisites
@@ -83,24 +91,76 @@ Before submitting PR:
 - [ ] Responsive design maintained
 - [ ] No console JavaScript errors
 
-## Common Tasks
 
-### Syncing with latest dev
+
+# Development Workflow
+
+## Branch Structure
+- `main` — production (protected)
+- `dev` — staging/integration (protected)
+- `feature/*` — feature branches
+- `bugfix/*` — fixes
+
+Contributors should fork and open PRs targeting `dev`.
+
+## Creating a Branch
 ```bash
-git fetch origin
-git rebase origin/dev
+git checkout dev
+git pull origin dev
+git checkout -b feature/your-feature-name
 ```
 
-### Updating ACF JSON files
-- ACF JSON auto-syncs to `acf-json/` folder
-- Commit these changes with your feature
+## Commit Messages
+Use conventional prefixes: `feat:`, `fix:`, `docs:`, `refactor:`, `style:`, `test:`.
 
-### Database Considerations
-- Use ACF field groups for any new data structures
-- Update `acf-json/` files in your commits
+# Pull Requests
 
-## Questions?
+- Target branch: `dev`
+- One logical change per PR
+- Include description, related issues, and QA steps
+- Request reviewers and wait for approval before merging
 
-- Check existing GitHub Issues
-- Open a new Issue for bugs or suggestions
-- Contact team leads for guidance
+PR checklist:
+- [ ] Branch up to date with `dev`
+- [ ] ACF JSON updated if relevant
+- [ ] No debug output
+
+# Testing & Quality
+
+Before opening a PR verify:
+- No PHP errors or warnings
+- No JS console errors
+- ACF fields load and save
+- Responsive layout
+- Visual checks in major browsers
+
+Automated checks (if configured) should run on PRs.
+
+# ACF & Database
+
+- ACF is required and must be activated before the theme.
+- ACF JSON files live in `acf-json/` — commit changes to field groups.
+- Use provided SQL dumps for testing multisite if needed.
+
+# Multisite
+
+This theme is built with multisite support in mind (uses `switch_to_blog()`/`restore_current_blog()` for cross-site content). If you run a single-site WordPress instance, the theme guards multisite calls so it won't fatal — but some features expect multisite data. For multisite testing, import the provided dumps or enable multisite in your local `wp-config.php`.
+
+# Database & Users
+
+For large data edits (user cleanup, author reassignment), use WP‑CLI when possible (it handles serialized data). Always backup the DB before destructive operations.
+
+Example: reassign posts and delete users safely with WP‑CLI:
+```bash
+# reassign and delete user IDs safely (run inside wordpress container)
+wp user delete 4 5 6 --reassign=1 --allow-root
+```
+
+---
+
+# Questions
+
+If you need help: open an Issue, or contact maintainers.
+
+```
+

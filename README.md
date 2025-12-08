@@ -30,14 +30,15 @@ git clone https://github.com/davidgraeber/dg-org-theme
 cd dg-org-theme
 ```
 
-**Configure WordPress:**
-- Copy `wp-config-sample.php` to your WordPress installation as reference or base for configuration
-- Set up your database credentials in `wp-config.php`
-- For multisite testing, use the included database dump files (`.sql`) to restore a pre-configured multisite instance
+**Configure WordPress (local/dev):**
+- Install WordPress locally (Docker, Local, MAMP, etc.)
+- Place or symlink the theme into `/wp-content/themes/<THEME NAME>/`
+- Set your database credentials in `wp-config.php` or use the provided Docker environment
+- For multisite testing, import the provided database dump (see Database for Testing)
 
-**Activate plugins and theme (in order):**
-1. **Activate Advanced Custom Fields Pro plugin first** — required by theme
-2. Then activate the "Whatever" theme
+**Activate plugins and theme (order):**
+1. **Activate Advanced Custom Fields Pro** (ACF) first — required by theme
+2. Activate the "Whatever" theme
 
 ## Requirements
 
@@ -100,22 +101,31 @@ dg-org-theme/
 
 **Using Local:**
 1. Create new WordPress site
-2. Clone theme to `/public/wp-content/themes/wtvr/`
+2. Clone theme to `/public/wp-content/themes/<THEME NAME>/`
 3. Activate Advanced Custom Fields Pro plugin first
 4. Then activate "Whatever" theme
 
 ### Database for Testing
 
-The repository includes SQL database dumps for testing the multisite configuration:
-- `dgorg.sql` — Database export for testing
+The repository includes a database dump for testing the multisite configuration:
+- `dgorg.sql.zip` — Database export for testing (ZIP containing `dgorg.sql`).
+
+To use the dump:
+
+```bash
+unzip dgorg.sql.zip          # extracts dgorg.sql
+# then import with mysql or phpMyAdmin, for example:
+mysql -u root -p your_db_name < dgorg.sql
+```
+
+Or use phpMyAdmin to upload the `dgorg.sql` file (increase upload limits if needed).
 
 ### Configuration
 
 Use `wp-config-sample.php` as a reference for WordPress configuration. The file includes:
-- Database connection settings
-- Security keys and salts
-- Multisite configuration (commented by default)
-- Debug logging options
+- Database table prefix
+- Debugging constants (e.g. `WP_DEBUG`)
+- Multisite-related constants (e.g. `WP_ALLOW_MULTISITE`, `MULTISITE`, `SUBDOMAIN_INSTALL`, domain/path/site IDs)
 
 ### Code Standards
 
