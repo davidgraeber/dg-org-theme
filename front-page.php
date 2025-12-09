@@ -26,6 +26,8 @@ get_header(); ?>
 			</div>
         </section>
 
+		<?php do_action( 'wtvr_translations_section_display' ); ?>
+		
 		<section class="featured-books">
 			
 				<?php $featured_books = get_field('featured_books');?>
@@ -180,7 +182,7 @@ get_header(); ?>
 		</a>
 
 
-	    <?php do_action( 'wtvr_translations_section_display' ); ?>
+	    
 
     </main><!-- #main -->
 

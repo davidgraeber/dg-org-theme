@@ -10,27 +10,26 @@
 
 get_header();
 $post_type = get_post_type();
-
+$current_language = isset($_GET['book_language']) ? intval($_GET['book_language']) : '';
+$post_type_menu = post_type_menu_filtered_by_language($post_type, $current_language);
 ?>
 
     <main id="primary" class="site-main">
 
-        
-
 		<?php if ( have_posts() ) : ?>
 
         <header class="page-header archive-header">
-            <h1 class="page-title archive-title">
-				<?php echo get_the_archive_title(); ?>
-            </h1>
+            <div>
+                <h1 class="page-title archive-title">
+    				<?php echo get_the_archive_title(); ?>
+                </h1>
+                <?php if ( !empty($post_type_menu) ){ echo $post_type_menu; } ?>
+            </div>
             <div class="books-filter">
                 <form method="get" action="">
                     <select name="book_language" id="book-language" onchange="this.form.submit()">
                         <option value="">All languages</option>
                         <?php 
-                        // Получаем текущий выбранный язык
-                        $current_language = isset($_GET['book_language']) ? intval($_GET['book_language']) : '';
-                        
                         // Получаем все книги
                         $books = get_posts([
                             'post_type' => 'books',
