@@ -26,48 +26,8 @@ $post_type_menu = post_type_menu_filtered_by_language($post_type, $current_langu
                 <?php if ( !empty($post_type_menu) ){ echo $post_type_menu; } ?>
             </div>
             <div class="books-filter">
-                <form method="get" action="">
-                    <select name="book_language" id="book-language" onchange="this.form.submit()">
-                        <option value="">All languages</option>
-                        <?php 
-                        // Получаем все книги
-                        $books = get_posts([
-                            'post_type' => 'books',
-                            'posts_per_page' => -1,
-                            'fields' => 'ids'
-                        ]);
-                        
-                        $unique_languages = [];
-                        
-                        // Собираем все уникальные языки из переводов
-                        foreach($books as $book_id) {
-                            if($translations = get_field('translations', $book_id)) {
-                                foreach($translations as $translation) {
-                                    if(isset($translation['language'][0])) {
-                                        $lang = $translation['language'][0];
-                                        $unique_languages[$lang->term_id] = $lang->name;
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // Сортируем языки по алфавиту
-                        asort($unique_languages);
-                        
-                        // Выводим опции
-                        foreach($unique_languages as $term_id => $name) {
-                            $selected = ($current_language !== '' && $current_language == $term_id) ? 'selected' : '';
-                            echo sprintf(
-                                '<option value="%s" %s>%s</option>',
-                                esc_attr($term_id),
-                                $selected,
-                                esc_html($name)
-                            );
-                        }
-                        ?>
-                    </select>
-                </form>
-        </div>
+                <?php get_template_part( 'template-parts/snippet', 'language-select', ['lang'  => $current_language,] ); ?>
+            </div>
         </header><!-- .page-header -->
 
         <section class="items">
