@@ -15,24 +15,35 @@ abstract class Archive_Layout {
 	}
 
 	public function header(){
+		$cpt_array = ['reviews', 'articles', 'papers', 'interviews', 'videos', 'audios', 'press', 'memorials', 'projects', 'unpublished'];
+		$post_type = $this->vars['post-type'];
+		$post_type_menu = [];
+		if ( in_array($post_type, $cpt_array, true) ){
+			$current_language = !empty($_GET['book_language']) ? intval($_GET['book_language']) : '';
+			$post_type_menu = ( $current_language ) ? post_type_menu_filtered_by_language($post_type, $current_language) : '';
+		};
 		?>
 
+			<div>
+				<h1 class="page-title archive-title"><?php echo get_the_archive_title(); ?></h1>
+				<?php if ( !empty($post_type_menu) ) { echo $post_type_menu; } ?>
+			</div>
 
-			<h1 class="page-title archive-title">
-				<?php echo get_the_archive_title(); ?>
-			</h1>
+			<?php if ( in_array($post_type, $cpt_array, true)) { ?>
+				<div class="book-filter">
+					<?php get_template_part( 'template-parts/snippet', 'language-select', [
+						'lang'  => $current_language,
+						'post_type' =>  $post_type
+					] ) ?>
+				</div>
+			<?php } ?>
 
 			<div class="page-description">
 				<?php if ( is_post_type_archive() ) {
-
 					the_field( $this->vars['post-type'] . '-description', 'option' );
-
 				} else {
-
 					echo get_the_archive_description();
-
-				} ?>
-
+				}?>
 			</div>
 
 		<?php
