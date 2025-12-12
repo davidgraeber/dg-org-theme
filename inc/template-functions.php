@@ -5,6 +5,36 @@
  * @package Whatever
  */
 
+
+// Return all books ID with selected language
+function get_books_ID_with_selected_lang($selected_language_id){
+	$posts_with_language = [];
+	$all_books = get_posts([
+		'post_type' => 'books',
+		'posts_per_page' => -1,
+		'fields' => 'ids'
+	]);
+	
+	foreach($all_books as $book_id) {
+		if(have_rows('translations', $book_id)) {
+			while(have_rows('translations', $book_id)) {
+				the_row();
+				if($language = get_sub_field('language')) {
+					foreach($language as $lang) {
+						if($lang->term_id == $selected_language_id) {
+							$posts_with_language[] = $book_id;
+							break 2; // Прерываем оба цикла, если нашли язык
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return $posts_with_language;
+}
+				
+
 // return menu on archive page with ctps have posts in selected language
 function post_type_menu_filtered_by_language($post_type, $lang_id){
 	$post_type_menu =[];
@@ -17,18 +47,23 @@ function post_type_menu_filtered_by_language($post_type, $lang_id){
 
 		//for every cpt check posts with selected language
 		foreach ($all_cpt_array as $cpt){
-			$args = array(
-				'post_type' => $cpt,
-				'posts_per_page' => 1,
-				'tax_query' => array(
-					array(
-						'taxonomy' => 'language',
-						'field'    => 'id',
-						'terms'    => $lang_id
+			if ( 'books' == $cpt ){
+				$cpt_post = get_books_ID_with_selected_lang($lang_id);
+			} else {
+				$args = array(
+					'post_type' => $cpt,
+					'posts_per_page' => 1,
+					'tax_query' => array(
+						array(
+							'taxonomy' => 'language',
+							'field'    => 'id',
+							'terms'    => $lang_id
+						)
 					)
-				)
-			);
-			$cpt_post = get_posts($args);
+				);
+				$cpt_post = get_posts($args);
+			}
+			
 			//add menu item with current cpt if get post with selected language
 			if ( !empty($cpt_post) ){
 				$site_url = home_url();
@@ -57,29 +92,7 @@ function filter_cpt_by_language($query) {
 			$selected_language_id = intval($_GET['book_language']);
 
 			if ( is_post_type_archive( 'books' ) ){
-				// Получаем все ID постов, у которых есть перевод на выбранный язык
-				$posts_with_language = [];
-				$all_books = get_posts([
-					'post_type' => 'books',
-					'posts_per_page' => -1,
-					'fields' => 'ids'
-				]);
-				
-				foreach($all_books as $book_id) {
-					if(have_rows('translations', $book_id)) {
-						while(have_rows('translations', $book_id)) {
-							the_row();
-							if($language = get_sub_field('language')) {
-								foreach($language as $lang) {
-									if($lang->term_id == $selected_language_id) {
-										$posts_with_language[] = $book_id;
-										break 2; // Прерываем оба цикла, если нашли язык
-									}
-								}
-							}
-						}
-					}
-				}
+				$posts_with_language = get_books_ID_with_selected_lang($selected_language_id);
 				
 				if(!empty($posts_with_language)) {
 					$query->set('post__in', $posts_with_language);

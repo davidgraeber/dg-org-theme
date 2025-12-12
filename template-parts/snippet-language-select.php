@@ -7,37 +7,58 @@
  *
  */
 $current_language = $args['lang'];
+$post_type = $args['post_type'];
 ?>
 
 <form method="get" action="">
     <select name="book_language" id="book-language" onchange="this.form.submit()">
         <option value="">All languages</option>
-        <?php 
-        // Получаем все книги
-        $books = get_posts([
-            'post_type' => 'books',
-            'posts_per_page' => -1,
-            'fields' => 'ids'
-        ]);
-        
+        <?php
         $unique_languages = [];
-        
-        // Собираем все уникальные языки из переводов
-        foreach($books as $book_id) {
-            if($translations = get_field('translations', $book_id)) {
-                foreach($translations as $translation) {
-                    if(isset($translation['language'][0])) {
-                        $lang = $translation['language'][0];
+
+        //get unique languages from books
+        if ("books" == $post_type ) {
+            $books = get_posts([
+                'post_type' => 'books',
+                'posts_per_page' => -1,
+                'fields' => 'ids'
+            ]);
+            
+            foreach($books as $book_id) {
+                if($translations = get_field('translations', $book_id)) {
+                    foreach($translations as $translation) {
+                        if(isset($translation['language'][0])) {
+                            $lang = $translation['language'][0];
+                            $unique_languages[$lang->term_id] = $lang->name;
+                        }
+                    }
+                }
+            }
+
+        //get unique languages from other cpts
+        } else {
+            $cpt_posts = get_posts([
+                'post_type' => $post_type,
+                'posts_per_page' => -1,
+                'fields' => 'ids'
+            ]);
+
+            if ( !empty($cpt_posts) ){
+                foreach($cpt_posts as $post_id) {
+                    $term = get_the_terms( $post_id, 'language' );
+                    if( !empty($term) ){
+                        //get first term from array
+                        $lang = array_shift( $term );
                         $unique_languages[$lang->term_id] = $lang->name;
                     }
                 }
             }
         }
         
-        // Сортируем языки по алфавиту
+        //sort languages in alphabetical order
         asort($unique_languages);
         
-        // Выводим опции
+        //html form output
         foreach($unique_languages as $term_id => $name) {
             $selected = ($current_language !== '' && $current_language == $term_id) ? 'selected' : '';
             echo sprintf(
