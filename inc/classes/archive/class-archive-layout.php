@@ -27,10 +27,17 @@ abstract class Archive_Layout {
 			<div>
 				<h1 class="page-title archive-title"><?php echo get_the_archive_title(); ?></h1>
 				<?php if ( !empty($post_type_menu) ) { echo $post_type_menu; } ?>
+				<div class="page-description">
+					<?php if ( is_post_type_archive() ) {
+						the_field( $this->vars['post-type'] . '-description', 'option' );
+					} else {
+						echo get_the_archive_description();
+					}?>
+				</div>
 			</div>
 
 			<?php if ( in_array($post_type, $cpt_array, true)) { ?>
-				<div class="book-filter">
+				<div class="books-filter">
 					<?php get_template_part( 'template-parts/snippet', 'language-select', [
 						'lang'  => $current_language,
 						'post_type' =>  $post_type
@@ -38,13 +45,6 @@ abstract class Archive_Layout {
 				</div>
 			<?php } ?>
 
-			<div class="page-description">
-				<?php if ( is_post_type_archive() ) {
-					the_field( $this->vars['post-type'] . '-description', 'option' );
-				} else {
-					echo get_the_archive_description();
-				}?>
-			</div>
 
 		<?php
 	}
