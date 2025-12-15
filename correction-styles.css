@@ -816,6 +816,11 @@ footer .inner.special-3 {
 /*  background-image: url('/wp-content/themes/wtvr/img/DGO-arrow.svg');*/
 }
 
+.archive-controls {
+  display: none;
+}
+
+
 @media screen and (max-width: 768px) {
   .archive .nav-links {
     margin: 40px 20px;
@@ -1168,15 +1173,31 @@ footer .inner.special-3 {
 .archive-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  /*align-items: center;*/
   margin-top: calc(var(--base-spacing)*3);
   margin-bottom: calc(var(--base-spacing)*2);
 }
 
 .books-filter {
   margin: 0;
+  margin-top: 3px;
   margin-left: var(--base-spacing);
 }
+
+@media screen and (max-width: 768px) {
+  .archive-header {
+    display: block;
+    position: relative;
+  }
+
+  .books-filter {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+  }
+}
+
 .page-title.archive-title {
   margin: 0;
 }
