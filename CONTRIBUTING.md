@@ -13,8 +13,8 @@ Thank you for your interest in contributing! Please follow these guidelines.
 ## Setup Local Development
 
 ### Prerequisites
-- PHP 7.4+
-- WordPress 5.4+
+- PHP 8.1+
+- WordPress 6.8.3+
 - Composer (optional, for ACF Pro)
 - Git
 
@@ -35,7 +35,7 @@ npm install       # for frontend build tools (if applicable)
 - Activate the "Whatever" theme in WordPress admin
 
 4. **Activate required plugins:**
-- Advanced Custom Fields Pro 5.9.5+ (configure ACF license in `wp-config.php`)
+- Advanced Custom Fields Pro 5.9.5+ 
 
 ## Development Workflow
 
@@ -86,11 +86,10 @@ git commit -m "feat: add translation filter to book archive"
 Before submitting PR:
 - [ ] Feature works in local environment
 - [ ] No PHP errors/warnings in error log
-- [ ] Compatible with WordPress 5.4+
+- [ ] Compatible with WordPress 6.8.3+
 - [ ] ACF fields display correctly
 - [ ] Responsive design maintained
 - [ ] No console JavaScript errors
-
 
 
 # Development Workflow
@@ -144,17 +143,7 @@ Automated checks (if configured) should run on PRs.
 
 # Multisite
 
-This theme is built with multisite support in mind (uses `switch_to_blog()`/`restore_current_blog()` for cross-site content). If you run a single-site WordPress instance, the theme guards multisite calls so it won't fatal — but some features expect multisite data. For multisite testing, import the provided dumps or enable multisite in your local `wp-config.php`.
-
-# Database & Users
-
-For large data edits (user cleanup, author reassignment), use WP‑CLI when possible (it handles serialized data). Always backup the DB before destructive operations.
-
-Example: reassign posts and delete users safely with WP‑CLI:
-```bash
-# reassign and delete user IDs safely (run inside wordpress container)
-wp user delete 4 5 6 --reassign=1 --allow-root
-```
+This theme is built with multisite support in mind (uses `switch_to_blog()`/`restore_current_blog()` for cross-site content) -- some features expect multisite data. For multisite testing, import the provided dumps and enable multisite in your local `wp-config.php`.  
 
 ---
 

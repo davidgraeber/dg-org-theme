@@ -120,6 +120,13 @@ mysql -u root -p your_db_name < dgorg.sql
 
 Or use phpMyAdmin to upload the `dgorg.sql` file (increase upload limits if needed).
 
+**Admin credentials included in this dump (local/dev only):**
+
+- **Login:** `admin`
+- **Password:** `12345678`
+
+These credentials are provided so you can log in to the imported site at `/wp-admin` after restoring the dump. 
+
 ### Configuration
 
 Use `wp-config-sample.php` as a reference for WordPress configuration. The file includes:
@@ -133,14 +140,6 @@ Use `wp-config-sample.php` as a reference for WordPress configuration. The file 
 - Use ACF for all custom fields
 - Use PHP namespace `Whatever\` for classes
 - Autoloading via `inc/autoloader.php`
-
-### Building/Compiling
-
-If using build tools:
-```bash
-npm run dev      # Development
-npm run build    # Production
-```
 
 ## Contributing
 
