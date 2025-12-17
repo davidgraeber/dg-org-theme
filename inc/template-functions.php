@@ -352,10 +352,12 @@ function wtvr_get_featured_images( $post_id ) {
 	}
 
 	$attachment_rows = get_field( 'files', $post_id );
-	if ( $attachment_rows ) {
-		$file_ID = $attachment_rows[0]['file']['ID'];
-
-		return [ $file_ID ];
+	if (
+		is_array( $attachment_rows ) &&
+		! empty( $attachment_rows[0]['file'] ) &&
+		! empty( $attachment_rows[0]['file']['ID'] )
+	) {
+		return [ $attachment_rows[0]['file']['ID'] ];
 	}
 
 	return false;
