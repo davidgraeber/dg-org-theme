@@ -12,8 +12,8 @@ $a = wtvr_localize_args( $args, [
   'no-thumbnail',
 ] );
 
-// Do not get video - it is disabled by 'no-thumbnail' above
-// $video = get_field( 'featured_video' );
+// Do not need video - it is disabled by 'no-thumbnail' above
+$video = get_field( 'featured_video' );
 
 
 $post_type        = get_post_type();
