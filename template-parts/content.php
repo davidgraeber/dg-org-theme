@@ -12,6 +12,10 @@ $a = wtvr_localize_args( $args, [
   'no-thumbnail',
 ] );
 
+// Do not get video - it is disabled by 'no-thumbnail' above
+// $video = get_field( 'featured_video' );
+
+
 $post_type        = get_post_type();
 $post_type_layout = get_field( $post_type . '-layout', 'option' );
 
@@ -38,12 +42,12 @@ if ( isset( $custom_features['layout'] ) ) {
 
 $images = wtvr_get_featured_images( get_the_ID() );
 
-$video = get_field( 'featured_video' );
+
 ?>
 
 <div class="grid grid-3 grid-article">
 
-
+	<!-- This part is hidden by setting 'no-thumbnail' -->
 	<?php if ( ! $a['no-thumbnail'] && 'people' !== $post_type) : ?>
         <section class="feature <?php echo $layout; ?>">
 			<?php if ( $video ) {
