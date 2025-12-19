@@ -1,5 +1,3 @@
-new edits
-
 # Whatever (DG Org Wordpress Theme)
 
 Contributors: automattic  
