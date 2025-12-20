@@ -22,6 +22,7 @@ function wtvr_taxonomies() {
 		  'new_item_name'     => 'New Language Name',
 		  'menu_name'         => 'Languages',
 		],
+		'show_admin_column' => true,
 		'query_var'    => true,
 		'rewrite'      => false,
 		'show_ui' => true,

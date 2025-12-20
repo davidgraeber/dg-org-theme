@@ -23,7 +23,7 @@ function get_books_ID_with_selected_lang($selected_language_id){
 					foreach($language as $lang) {
 						if($lang->term_id == $selected_language_id) {
 							$posts_with_language[] = $book_id;
-							break 2; // Прерываем оба цикла, если нашли язык
+							break 2; // If language found stop both cycles
 						}
 					}
 				}
@@ -97,7 +97,7 @@ function filter_cpt_by_language($query) {
 				if(!empty($posts_with_language)) {
 					$query->set('post__in', $posts_with_language);
 				} else {
-					// Если не найдено книг с выбранным языком, возвращаем пустой результат
+					// If no books found with selected langugage return empty result
 					$query->set('post__in', [0]);
 				}
 			} elseif( is_archive() && in_array($query_post_type, $cpt_array, true)) {
@@ -112,10 +112,16 @@ function filter_cpt_by_language($query) {
         } else { //book_language unset or empty
 			if ( in_array($query_post_type, $cpt_array, true) ) {
 				$query->set('tax_query', array(
-					array(
+					'relation' => 'OR',
+					[
 						'taxonomy' => 'language',
-						'operator' => 'NOT EXISTS',
-					),
+						'operator' => 'NOT EXISTS'
+					],
+					[
+						'taxonomy' => 'language',
+						'field'    => 'id',
+						'terms'    => 50, //default language English
+					]
 				));
 			}
 		}
@@ -124,7 +130,7 @@ function filter_cpt_by_language($query) {
 }
 add_action('pre_get_posts', 'filter_cpt_by_language');
 
-// Очищаем кэш языков при обновлении постов типа books
+// Clean lagugage cash after book posts update
 function clear_books_languages_cache($post_id) {
     if(get_post_type($post_id) === 'books') {
         delete_transient('books_languages');
